@@ -1,0 +1,6 @@
+{
+  "name": "CricPulse",
+  "description": "Real-time second-screen companion app for IPL cricket that translates viewers into participants with predictions, reactions, fan chat, and match dashboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
