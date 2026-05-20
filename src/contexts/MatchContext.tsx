@@ -106,44 +106,60 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     if (activeMatchId === 'match-1') {
-      // KKR vs MI as upcoming
       const kkrMi = createDefaultScorecard('KKR', 'MI');
-      kkrMi.status = 'upcoming';
-      kkrMi.runs = 0;
-      kkrMi.wickets = 0;
-      kkrMi.oversCompleted = 0;
-      kkrMi.ballsCurrentOver = 0;
-      kkrMi.recentBalls = [];
-      // Empty batting/bowl stats for upcoming
-      Object.keys(kkrMi.scorecard.batting).forEach(k => {
-        kkrMi.scorecard.batting[k].runs = 0;
-        kkrMi.scorecard.batting[k].balls = 0;
-        kkrMi.scorecard.batting[k].fours = 0;
-        kkrMi.scorecard.batting[k].sixes = 0;
-        kkrMi.scorecard.batting[k].strikeRate = 0;
-      });
-      Object.keys(kkrMi.scorecard.bowling).forEach(k => {
-        kkrMi.scorecard.bowling[k].overs = 0;
-        kkrMi.scorecard.bowling[k].runsConceded = 0;
-        kkrMi.scorecard.bowling[k].wickets = 0;
-        kkrMi.scorecard.bowling[k].economy = 0;
-      });
-      setMatch(kkrMi);
-      setMoments([
-        {
-          id: 'prematch-moment-1-kkr',
-          over: 0,
-          ball: 0,
-          type: 'info',
-          title: 'Squads Prepared!',
-          desc: 'KKR and MI lineups lock in. The ground crew at Eden Gardens reports a hard, high-scoring surface!',
-          timestamp: '18:15',
-          reactionCount: 450
-        }
-      ]);
-      setChatMessages(INITIAL_CHAT);
-      setPolls(INITIAL_POLLS);
-      setSupportSplit({ KKR: 55, MI: 45 });
+      
+      // Determine if match hour is currently active: approx 13:00 to 20:59 UTC
+      const utcHours = new Date().getUTCHours();
+      const isMatchHours = utcHours >= 13 && utcHours < 21;
+
+      if (isMatchHours) {
+        // Automatically start the match as live!
+        kkrMi.status = 'live';
+        setMatch(kkrMi);
+        setMoments(INITIAL_MOMENTS);
+        setChatMessages(INITIAL_CHAT);
+        setPolls(INITIAL_POLLS);
+        setSupportSplit({ KKR: 55, MI: 45 });
+        setIsSimulating(true);
+      } else {
+        // Standard pre-match upcoming setup
+        kkrMi.runs = 0;
+        kkrMi.wickets = 0;
+        kkrMi.oversCompleted = 0;
+        kkrMi.ballsCurrentOver = 0;
+        kkrMi.recentBalls = [];
+        // Empty batting/bowl stats for upcoming
+        Object.keys(kkrMi.scorecard.batting).forEach(k => {
+          kkrMi.scorecard.batting[k].runs = 0;
+          kkrMi.scorecard.batting[k].balls = 0;
+          kkrMi.scorecard.batting[k].fours = 0;
+          kkrMi.scorecard.batting[k].sixes = 0;
+          kkrMi.scorecard.batting[k].strikeRate = 0;
+        });
+        Object.keys(kkrMi.scorecard.bowling).forEach(k => {
+          kkrMi.scorecard.bowling[k].overs = 0;
+          kkrMi.scorecard.bowling[k].runsConceded = 0;
+          kkrMi.scorecard.bowling[k].wickets = 0;
+          kkrMi.scorecard.bowling[k].economy = 0;
+        });
+        setMatch(kkrMi);
+        setMoments([
+          {
+            id: 'prematch-moment-1-kkr',
+            over: 0,
+            ball: 0,
+            type: 'info',
+            title: 'Squads Prepared!',
+            desc: 'KKR and MI lineups lock in. The ground crew at Eden Gardens reports a hard, high-scoring surface!',
+            timestamp: '18:15',
+            reactionCount: 450
+          }
+        ]);
+        setChatMessages(INITIAL_CHAT);
+        setPolls(INITIAL_POLLS);
+        setSupportSplit({ KKR: 55, MI: 45 });
+        setIsSimulating(false);
+      }
       battingRosterIndex.current = 4;
     } else if (activeMatchId === 'match-2') {
       // Upcoming match RCB vs CSK
@@ -661,7 +677,8 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const away = getTeamTheme(match.awayTeam).code;
           setSupportSplit(cur => {
             const ratio = optionIndex === 0 ? 1 : -1;
-            const updatedSide = Math.min(85, Math.max(15, cur[side] + ratio * 2));
+            const currentSideVal = cur[side] !== undefined ? cur[side] : 50;
+            const updatedSide = Math.min(85, Math.max(15, currentSideVal + ratio * 2));
             return {
               [side]: updatedSide,
               [away]: 100 - updatedSide

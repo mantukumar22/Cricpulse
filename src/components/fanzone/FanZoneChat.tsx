@@ -81,7 +81,7 @@ export const FanZoneChat: React.FC = () => {
             ref={chatScrollRef}
             className="flex-1 p-5 overflow-y-auto flex flex-col gap-3 scroll-smooth max-h-[350px]"
           >
-            {[...chatMessages].reverse().map((msg, index) => {
+            {chatMessages.map((msg, index) => {
               const theme = getTeamTheme(msg.teamCode);
               const isUser = msg.isUser;
 

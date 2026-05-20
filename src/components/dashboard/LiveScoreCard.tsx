@@ -281,15 +281,15 @@ export const LiveScoreCard: React.FC = () => {
 
             {/* Field squads drawer */}
             {showSquads && (
-              <div className="w-full max-w-xl grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/5 text-left animate-fade-in">
+              <div className="w-full max-w-xl grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/5 text-left animate-fade-in">
                 <div className="bg-zinc-950/40 p-4 rounded-xl border border-white/5">
                   <span className="text-xs font-bold text-white block mb-2.5 flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded bg-[#EC1C24] inline-block" />
                     {match.homeTeam} Probable XI
                   </span>
-                  <ul className="space-y-1 text-xs text-zinc-400 font-mono">
+                  <ul className="space-y-1.5 text-xs text-zinc-400 font-mono">
                     {TEAMS[match.homeTeam]?.players.map((p, index) => (
-                      <li key={p} className="flex justify-between border-b border-white/2 py-1 last:border-0 pl-1">
+                      <li key={p} className="flex justify-between border-b border-white/5 py-1 last:border-0 pl-1">
                         <span>{p}</span>
                         <span className="text-[10px] text-zinc-600">{index < 5 ? "Batsman" : index < 7 ? "All Rounder" : "Bowler"}</span>
                       </li>
@@ -301,9 +301,9 @@ export const LiveScoreCard: React.FC = () => {
                     <span className="w-2.5 h-2.5 rounded bg-[#3A225D] inline-block" />
                     {match.awayTeam} Probable XI
                   </span>
-                  <ul className="space-y-1 text-xs text-zinc-400 font-mono">
+                  <ul className="space-y-1.5 text-xs text-zinc-400 font-mono">
                     {TEAMS[match.awayTeam]?.players.map((p, index) => (
-                      <li key={p} className="flex justify-between border-b border-white/2 py-1 last:border-0 pl-1">
+                      <li key={p} className="flex justify-between border-b border-white/5 py-1 last:border-0 pl-1">
                         <span>{p}</span>
                         <span className="text-[10px] text-zinc-600">{index < 5 ? "Batsman" : index < 7 ? "All Rounder" : "Bowler"}</span>
                       </li>
@@ -357,14 +357,52 @@ export const LiveScoreCard: React.FC = () => {
 
   // Render LIVE scorecard
   return (
-    <GlassCard className="relative overflow-hidden border border-white/10 p-0 mb-6 bg-gradient-to-br from-zinc-950 via-zinc-950 to-black/95">
+    <div className="flex flex-col gap-5">
+      {/* Dynamic API Integrity / Connection Exception Banner */}
+      {apiError && (
+        <div className="p-4 rounded-xl border border-red-500/20 bg-gradient-to-r from-red-950/40 via-red-900/10 to-black/80 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-slide-down">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 shrink-0 mt-0.5">
+              <AlertTriangle className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-mono font-extrabold text-red-400 uppercase tracking-wider bg-red-900/40 px-2 py-0.5 rounded border border-red-500/20">
+                  {apiError.key}
+                </span>
+                <span className="text-[10px] font-mono text-zinc-500">Route: {apiError.route}</span>
+              </div>
+              <p className="text-zinc-300 text-xs mt-1.5 leading-relaxed leading-normal">
+                {apiError.message}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button 
+              onClick={verifyAPIIntegrity}
+              disabled={checkingApi}
+              className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-[10px] font-bold text-zinc-300 border border-white/5 uppercase tracking-wider cursor-pointer whitespace-nowrap active:scale-95 transition-all disabled:opacity-50"
+            >
+              {checkingApi ? "Tuning..." : "Retry Call"}
+            </button>
+            <button 
+              onClick={() => setApiError(null)}
+              className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <GlassCard className="relative overflow-hidden border border-white/10 p-0 mb-6 bg-gradient-to-br from-zinc-950 via-zinc-950 to-black/95">
       {/* Dynamic Team Neon Glow Overlay */}
       <div 
         className="absolute top-0 right-0 w-80 h-40 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20 opacity-30" 
         style={{ backgroundColor: battingTheme.primary }}
       />
       <div 
-        className="absolute bottom-0 left-0 w-80 h-4rem rounded-full blur-3xl pointer-events-none -ml-20 -mb-20 opacity-15"
+        className="absolute bottom-0 left-0 w-80 h-40 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20 opacity-15"
         style={{ backgroundColor: bowlingTheme.primary }}
       />
 
@@ -547,5 +585,6 @@ export const LiveScoreCard: React.FC = () => {
       </div>
 
     </GlassCard>
-  );
+  </div>
+);
 };

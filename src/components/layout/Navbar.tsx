@@ -43,6 +43,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
     { id: 'stats', label: 'Analytics' }
   ];
 
+  const currentStatus = (match && (
+    (activeMatchId === 'match-1' && match.homeTeam === 'KKR') ||
+    (activeMatchId === 'match-2' && match.homeTeam === 'RCB')
+  )) ? match.status : activeSchedule.status;
+
   return (
     <nav className="sticky top-0 z-50 w-full bg-[#0A0C10]/80 backdrop-blur-md border-b border-white/10 px-6 py-3">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -62,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
                 IPL Fan Hub
               </span>
             </div>
-
+ 
             {/* Red Live Pulse Badge from Sleek Interface HTML */}
             <div className="px-3 py-1 bg-red-600/20 border border-red-500/30 rounded-full flex items-center gap-2">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -80,13 +85,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
                 {activeSchedule.homeTeam} vs {activeSchedule.awayTeam}
               </span>
               <span className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-bold ${
-                activeSchedule.status === 'live'
+                currentStatus === 'live'
                   ? 'bg-red-500/10 text-red-400 border border-red-500/30'
-                  : activeSchedule.status === 'finished'
+                  : currentStatus === 'finished'
                   ? 'bg-zinc-500/20 text-zinc-400'
                   : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
               }`}>
-                {activeSchedule.status}
+                {currentStatus}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
             </button>
@@ -96,30 +101,37 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
                 <div className="text-[9px] font-mono text-zinc-500 px-3 py-1 uppercase tracking-widest border-b border-white/5 mb-1">
                   Select Active Match
                 </div>
-                {MATCHES_SCHEDULE.map(m => (
-                  <button
-                    key={m.id}
-                    onClick={() => handleMatchSelect(m.id)}
-                    className={`w-full text-left p-2.5 rounded-lg hover:bg-white/5 transition-all flex items-center justify-between cursor-pointer ${
-                      activeMatchId === m.id ? 'bg-white/10 font-bold border border-white/10' : ''
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-white">{m.homeTeam} vs {m.awayTeam}</span>
-                        <span className={`text-[8px] uppercase font-mono px-1 rounded ${
-                          m.status === 'live' ? 'bg-red-500 text-white animate-pulse' : 'bg-zinc-800 text-zinc-400'
-                        }`}>
-                          {m.status}
-                        </span>
+                {MATCHES_SCHEDULE.map(m => {
+                  const mStatus = (match && (
+                    (m.id === 'match-1' && match.homeTeam === 'KKR') ||
+                    (m.id === 'match-2' && match.homeTeam === 'RCB')
+                  )) ? match.status : m.status;
+
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => handleMatchSelect(m.id)}
+                      className={`w-full text-left p-2.5 rounded-lg hover:bg-white/5 transition-all flex items-center justify-between cursor-pointer ${
+                        activeMatchId === m.id ? 'bg-white/10 font-bold border border-white/10' : ''
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-white">{m.homeTeam} vs {m.awayTeam}</span>
+                          <span className={`text-[8px] uppercase font-mono px-1 rounded ${
+                            mStatus === 'live' ? 'bg-red-500 text-white animate-pulse' : 'bg-zinc-800 text-zinc-400'
+                          }`}>
+                            {mStatus}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-zinc-400 mt-0.5 truncate max-w-[210px]">{m.venue}</div>
                       </div>
-                      <div className="text-[10px] text-zinc-400 mt-0.5 truncate max-w-[210px]">{m.venue}</div>
-                    </div>
-                    <div className="text-[9px] font-mono font-bold text-zinc-500 whitespace-nowrap">
-                      {m.homeTeam === 'CSK' ? '💛' : m.homeTeam === 'RCB' ? '❤️' : m.homeTeam === 'KKR' ? '💜' : m.homeTeam === 'GT' ? '💙' : m.homeTeam === 'SRH' ? '🧡' : '⚡'}
-                    </div>
-                  </button>
-                ))}
+                      <div className="text-[9px] font-mono font-bold text-zinc-500 whitespace-nowrap">
+                        {m.homeTeam === 'CSK' ? '💛' : m.homeTeam === 'RCB' ? '❤️' : m.homeTeam === 'KKR' ? '💜' : m.homeTeam === 'GT' ? '💙' : m.homeTeam === 'SRH' ? '🧡' : '⚡'}
+                      </div>
+                    </button>
+                  );
+                })}
                 
                 <div className="border-t border-white/5 mt-1 pt-1 flex justify-between px-2">
                   <button 

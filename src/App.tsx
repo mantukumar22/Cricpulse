@@ -16,6 +16,7 @@ import { PollsAndReactions } from './components/polls/PollsAndReactions';
 import { FanZoneChat } from './components/fanzone/FanZoneChat';
 import { StatsDashboard } from './components/stats/StatsDashboard';
 import { Flame, Trophy, Info, XCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 // Lightweight, responsive CSS falling particles overlay
 const ConfettiRain: React.FC = () => {
@@ -120,10 +121,20 @@ const MainLayout: React.FC = () => {
       <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
 
       {/* Main viewport Container */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 py-6 md:py-8">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 py-6 md:py-8 overflow-hidden">
         
         {/* Dynamic Content Frame */}
-        {renderTabContent()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentTab}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+          >
+            {renderTabContent()}
+          </motion.div>
+        </AnimatePresence>
 
       </div>
 

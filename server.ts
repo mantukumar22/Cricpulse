@@ -62,6 +62,52 @@ app.get("/api/cricket/matches", async (req, res) => {
 });
 
 // 2. AI Live Commentary generator (SECURE: Gemini Key remains server-only)
+function getDynamicLocalCommentary(matchState: any) {
+  const { battingTeam, bowlingTeam, runs, wickets, oversCompleted, ballsCurrentOver, batsmen, bowler, recentBalls } = matchState;
+  const lastEvent = recentBalls && recentBalls.length > 0 ? recentBalls[recentBalls.length - 1] : '';
+  const batsmanName = batsmen?.[0]?.name?.split(' ')?.[0] || 'Batsman';
+  const bowlerName = bowler?.name?.split(' ')?.[0] || 'Bowler';
+
+  const sixesPool = [
+    `CRACK! That went like a tracer bullet! ${batsmanName} has dispatched this way back into the stands! DHAAAGAAA KHOL DIYA! The crowd at Eden Gardens is going wild!`,
+    `AAMTI-KHEL FROM ${batsmanName}! That's absolutely massive, hitting the roof of the stadium! Harsha Bhogle would say, "If you are a spectator here, keep your eyes on the ball!"`,
+    `LAUUUNCHED! Absolute legendary helicopter shot by ${batsmanName}! Smashed with pure wrist work and timing, bowler ${bowlerName} is looking absolutely clueless!`,
+    `IT'S GOING, GOING, AND GONE! ${batsmanName} goes downtown, and it clears the ropes by a country mile! What a sensational strike!`
+  ];
+
+  const foursPool = [
+    `CRACKED! Glorious boundary by ${batsmanName}, threaded between cover and point like an absolute bullet! Timing of the highest order!`,
+    `FOUR! ${batsmanName} with a gorgeous cover drive! Just a gentle tap, but the outfield is lightning fast. No one is stopping that!`,
+    `SMASHED! Short ball from ${bowlerName}, and ${batsmanName} pulls it forcefully to deep square leg for a magnificent four!`,
+    `SHOT! Squeezed past third man for a cheeky four! Highly intelligent cricket from ${batsmanName}, adjusting late.`
+  ];
+
+  const wicketsPool = [
+    `OUT! GONE! Clean bowled! ${bowlerName} has shattered the woodwork! The middle stump is cartwheeling, and the crowd goes absolutely silent! What a fiery delivery!`,
+    `ITS WICKET! Caught in the deep! ${batsmanName} went for the big one, but miscued it completely. Outstanding diving catch on the boundary lines!`,
+    `BIG APPEAL AND THE FINGER GOES UP! Plumb LBW! ${bowlerName} traps ${batsmanName} on the pads. Beautiful inswinger, no doubt about that dismissal!`,
+    `RUN OUT! Sensation on the field! Quick direct hit from the circle, and ${batsmanName} was miles out. Absolute panic in the batting camp!`
+  ];
+
+  const genericPool = [
+    `Squeezed down to long-on for a quick single, keeping the strike rotating. ${batsmanName} looks nicely settled.`,
+    `Excellent yorker from ${bowlerName}, blocked firmly by ${batsmanName}. Great comeback after that earlier delivery.`,
+    `Tucked off the hips block to mid-wicket for a single. High-intensity running from both batsmen!`,
+    `Dot ball! Good discipline from ${bowlerName}, pitching in and around off stump, giving nothing away to ${batsmanName}.`,
+    `Driven with power to long-off, fielders are quick to cut it off. Just a brace of runs.`
+  ];
+
+  if (lastEvent === '6') {
+    return sixesPool[Math.floor(Math.random() * sixesPool.length)];
+  } else if (lastEvent === '4') {
+    return foursPool[Math.floor(Math.random() * foursPool.length)];
+  } else if (lastEvent === 'W') {
+    return wicketsPool[Math.floor(Math.random() * wicketsPool.length)];
+  } else {
+    return genericPool[Math.floor(Math.random() * genericPool.length)];
+  }
+}
+
 app.post("/api/gemini/commentary", async (req, res) => {
   const { matchState } = req.body;
 
@@ -113,11 +159,13 @@ Maintain extreme hype. Focus on what might happen next, or analyze who is domina
     const errMsg = typeof error === 'object' ? JSON.stringify(error) : String(error);
     const isQuota = errMsg.toLowerCase().includes("quota") || errMsg.toLowerCase().includes("exhausted") || errMsg.toLowerCase().includes("429");
     console.error("Gemini AI Commentary failure:", errMsg);
-    res.status(isQuota ? 429 : 500).json({
-      success: false,
-      error: error.message || errMsg,
+    
+    // Return status 200 with fallback commentary & localHype flag so frontend continues acting smoothly
+    res.json({
+      success: true,
+      localHype: true,
       isQuotaExceeded: isQuota,
-      commentary: "Unbelievable game of cricket! The atmosphere at the stadium is electric right now. (Our interactive AI commentator has exhausted its free daily sandbox quota, but the game is still roaring!)"
+      commentary: getDynamicLocalCommentary(matchState)
     });
   }
 });

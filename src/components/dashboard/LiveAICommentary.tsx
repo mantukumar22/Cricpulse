@@ -9,8 +9,7 @@ export const LiveAICommentary: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [lastBall, setLastBall] = useState<string>(" ");
   const [apiError, setApiError] = useState<{ code: string; message: string } | null>(null);
-
-  if (!match || match.status !== "live") return null;
+  const [isLocalHype, setIsLocalHype] = useState<boolean>(false);
 
   const currentBallKey = match && match.status === "live"
     ? `${match.oversCompleted}.${match.ballsCurrentOver}-${match.runs}-${match.wickets}`
@@ -24,6 +23,7 @@ export const LiveAICommentary: React.FC = () => {
 
     setLoading(true);
     setApiError(null);
+    setIsLocalHype(false);
     try {
       const response = await fetch("/api/gemini/commentary", {
         method: "POST",
@@ -65,7 +65,13 @@ export const LiveAICommentary: React.FC = () => {
       if (data.success && data.commentary) {
         setCommentary(data.commentary);
         setLastBall(currentBallKey);
-        setApiError(null);
+        if (data.localHype) {
+          setIsLocalHype(true);
+          setApiError(null); // Clear errors because fallback handled it gracefully!
+        } else {
+          setIsLocalHype(false);
+          setApiError(null);
+        }
       }
     } catch (err: any) {
       console.error(err);
@@ -107,14 +113,19 @@ export const LiveAICommentary: React.FC = () => {
             )}
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] uppercase font-mono tracking-widest text-yellow-500 font-extrabold flex items-center gap-1">
                 <Sparkle className="w-3 h-3 text-yellow-400" />
                 Live Gemini Commentary Box
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono tracking-tighter uppercase bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 animate-pulse">
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono tracking-tighter uppercase bg-yellow-500/10 text-yellow-300 border border-yellow-500/20">
                 Ravi Shastri Mode
               </span>
+              {isLocalHype && (
+                <span className="px-1.5 py-0.5 rounded text-[8px] font-mono tracking-tight uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30 animate-pulse flex items-center gap-1">
+                  ⚡ Hype Engine (Local)
+                </span>
+              )}
             </div>
             
             <p className="text-zinc-200 text-xs mt-2 italic font-serif leading-relaxed pr-2">
