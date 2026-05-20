@@ -170,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
         </div>
 
         {/* User stats widget & profile avatar */}
-        <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2.5 md:gap-4 w-full md:w-auto justify-between md:justify-end">
           {/* Simulation controller */}
           {match && match.status === 'live' && (
             <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 pl-2.5 pr-1.5 py-1 rounded-full text-xs">

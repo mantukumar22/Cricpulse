@@ -54,7 +54,7 @@ export const FanZoneChat: React.FC = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       
       {/* 2-col left side: Live chat messaging boards */}
-      <div className="lg:col-span-2 flex flex-col h-[500px]">
+      <div className="lg:col-span-2 flex flex-col h-[440px] md:h-[500px]">
         
         <GlassCard className="flex flex-col h-full border border-white/5 p-0 bg-gradient-to-br from-zinc-950/80 via-zinc-950/90 to-black overflow-hidden flex-1">
           {/* Header */}
@@ -79,7 +79,7 @@ export const FanZoneChat: React.FC = () => {
           {/* Messages list (scrollable) */}
           <div 
             ref={chatScrollRef}
-            className="flex-1 p-5 overflow-y-auto flex flex-col gap-3 scroll-smooth max-h-[350px]"
+            className="flex-1 p-5 overflow-y-auto flex flex-col gap-3 scroll-smooth"
           >
             {chatMessages.map((msg, index) => {
               const theme = getTeamTheme(msg.teamCode);

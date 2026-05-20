@@ -335,7 +335,7 @@ export const PredictionGames: React.FC = () => {
               key={player.username}
               className={`flex items-center justify-between p-2.5 rounded-xl transition-all border ${
                 player.isUser 
-                  ? 'bg-zinc-800/80 border-yellow-500-20 ring-1 ring-yellow-500/30' 
+                  ? 'bg-zinc-800/80 border-yellow-500/20 ring-1 ring-yellow-500/30' 
                   : 'bg-black/30 border-white/5'
               }`}
             >

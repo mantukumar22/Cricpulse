@@ -195,7 +195,7 @@ export const LiveScoreCard: React.FC = () => {
                 >
                   {match.homeTeam}
                 </div>
-                <span className="font-bold text-white text-base mt-3 leading-tight">{homeTheme.name}</span>
+                <span className="font-bold text-white text-xs sm:text-sm md:text-base mt-2.5 leading-tight">{homeTheme.name}</span>
                 <span className="text-zinc-500 text-[10px] font-mono uppercase bg-white/2 border border-white/5 rounded px-2 py-0.5 mt-1.5">Host Club</span>
               </div>
 
@@ -215,7 +215,7 @@ export const LiveScoreCard: React.FC = () => {
                 >
                   {match.awayTeam}
                 </div>
-                <span className="font-bold text-white text-base mt-3 leading-tight">{awayTheme.name}</span>
+                <span className="font-bold text-white text-xs sm:text-sm md:text-base mt-2.5 leading-tight">{awayTheme.name}</span>
                 <span className="text-zinc-500 text-[10px] font-mono uppercase bg-white/2 border border-white/5 rounded px-2 py-0.5 mt-1.5">Challenger</span>
               </div>
             </div>
